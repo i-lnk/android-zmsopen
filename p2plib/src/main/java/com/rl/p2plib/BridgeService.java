@@ -1,6 +1,7 @@
 package com.rl.p2plib;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -135,18 +136,12 @@ public class BridgeService extends Service implements P2PJniCallBack {
     public void onCreate() {
         XLog.i(TAG, "------------------> onCreate() ");
         super.onCreate();
-//		BootstrapService.startForeground(this);
-        // start BootstrapService to remove notification
-//		Intent intent = new Intent(this, BootstrapService.class);
-//		startService(intent);
-
         statusMap = new HashMap<>();
         if (devLock == null)
             devLock = new ReentrantLock(); //设备状态变化
-//		initNotification();
         initP2P();
-//		startForegroundCompat(NOTIF_ID, mNotif);
         registerReceiver();
+        startForeground();
         instance = this;
 
         XLog.i(TAG, "------------------> onCreate() END");
@@ -155,8 +150,7 @@ public class BridgeService extends Service implements P2PJniCallBack {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//		return super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+        return Service.START_STICKY;
     }
 
     @Override

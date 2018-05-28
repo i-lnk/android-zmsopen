@@ -430,4 +430,5 @@
     <string name="error_regist_phone">手机号码已注册</string>
     <string name="share_password">分享密码</string>
     <string name="error_no_permission">没有权限</string>
+    <string name="tips_loading_device">正在刷新设备列表...</string>
 </resources>

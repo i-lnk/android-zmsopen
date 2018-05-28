@@ -128,9 +128,9 @@ public class LoginAty extends AppCompatActivity{
                 if (userList.get(i).getActived()) {
                     cloudUser = userList.get(i);
                     mUsernameView.setText(cloudUser.getUsername());
-                    mPasswordView.setText("");
+                    mPasswordView.setText(cloudUser.getPassword());
                     Log.e("LoginAty","auto login with username: " +  cloudUser.getUsername());
-//                  attemptLogin();
+                    attemptLogin();
                     return;
                 }
             }

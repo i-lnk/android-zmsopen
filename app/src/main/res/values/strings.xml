@@ -428,4 +428,5 @@
     <string name="error_regist_phone">phone number already exists</string>
     <string name="share_password">share password</string>
     <string name="error_no_permission">no permission</string>
+    <string name="tips_loading_device">loading device list...</string>
 </resources>

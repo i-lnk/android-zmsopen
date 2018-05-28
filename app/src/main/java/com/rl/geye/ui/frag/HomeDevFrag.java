@@ -20,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -68,6 +69,7 @@ import com.rl.geye.ui.aty.ChooseDateAty;
 import com.rl.geye.ui.aty.DevAddAty;
 import com.rl.geye.ui.aty.DevQRCodeAty;
 import com.rl.geye.ui.aty.IpcVideoAty;
+import com.rl.geye.ui.aty.LauncherAty;
 import com.rl.geye.ui.aty.MainAty;
 import com.rl.geye.ui.aty.SetDevAty;
 import com.rl.geye.ui.dlg.InputDialog;
@@ -126,6 +128,7 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
     RippleView lyAdd;
     RippleView lyScan;
     RippleView lyAddLan;
+    ProgressBar pbDevicesLoading;
 
     private EdwinDevice mCurOpEdwinDevice;//当前操作设备
 
@@ -285,14 +288,32 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 //        initPushParam();
     }
 
+    private void showEmptyViewProgress(boolean enable){
+        ViewGroup vg = (ViewGroup) ((ViewGroup)emptyView).getChildAt(0);
+        int progressEnable = View.GONE;
+        int viewsEnable = View.GONE;
+        if(enable){
+            progressEnable = View.VISIBLE;
+            viewsEnable = View.GONE;
+        }else{
+            progressEnable = View.GONE;
+            viewsEnable = View.VISIBLE;
+        }
+
+        for(int i = 0;i < vg.getChildCount();i++){
+            vg.getChildAt(i).setVisibility(viewsEnable);
+        }
+        pbDevicesLoading.setVisibility(progressEnable);
+    }
+
     private void initEmptyView() {
         emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_dev, (ViewGroup) rvDev.getParent(), false);
 
         tvWelcome = emptyView.findViewById(R.id.tv_welcome);
         lyAdd = emptyView.findViewById(R.id.ly_add);
         lyAddLan = emptyView.findViewById(R.id.ly_add_lan);
-
         lyScan = emptyView.findViewById(R.id.ly_scan);
+        pbDevicesLoading = emptyView.findViewById(R.id.devices_loading_progress);
 
         tvWelcome.setText(getString(R.string.tips_welcome_to_use, getString(R.string.app_name)));
         lyAdd.setOnClickListener(this);
@@ -301,7 +322,6 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         lyAdd.setOnRippleCompleteListener(mRippleCompleteListener);
         lyAddLan.setOnRippleCompleteListener(mRippleCompleteListener);
         lyScan.setOnRippleCompleteListener(mRippleCompleteListener);
-
     }
 
     private List<EdwinDevice> loadDeviceListByCloud(List<CloudDevice> remoteDevices){
@@ -319,20 +339,21 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             }
         }
         //
-        for (int i = 0; i < remoteDevices.size(); i++) {
-            Log.e("insert device:",remoteDevices.get(i).getDevID());
+        for (CloudDevice cloudDevice:remoteDevices) {
+            Log.e("loadDeviceListByCloud","ready to insert device:" + cloudDevice.getDevID());
             EdwinDevice edwinDevice = new EdwinDevice();
-            edwinDevice.setDevId(remoteDevices.get(i).getDevID());
-            edwinDevice.setType(remoteDevices.get(i).getDevType());
+            edwinDevice.setDevId(cloudDevice.getDevID());
+            edwinDevice.setType(cloudDevice.getDevType());
             edwinDevice.setDefaultName(edwinDevice.getDevId(),edwinDevice.getType());
             int pos = localeDevices.indexOf(edwinDevice);
+            if(mAdapter.getData().contains(edwinDevice)) continue;
             if(pos < 0){
                 try{
                     edwinDevice.setOwnerid(MyApp.getCloudUser().getId());
                     edwinDevice.setUserPwdOK(false);
                     edwinDevice.setUser("");
                     edwinDevice.setPwd("");
-                    edwinDevice.setShareable(remoteDevices.get(i).getUserType() == 0);
+                    edwinDevice.setShareable(cloudDevice.getUserType() == 0);
                     MyApp.getDaoSession().getEdwinDeviceDao().insert(edwinDevice);
                     insertDevices.add(edwinDevice);
                 }catch (SQLiteException sqle){
@@ -343,11 +364,17 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             }
         }
 
+
+
         return insertDevices;
     }
 
     private void initDeviceAdapter(List<EdwinDevice> devices){
-        mAdapter.getData().addAll(devices);
+        if(devices.isEmpty()){
+            showEmptyViewProgress(false);
+        }else{
+            mAdapter.getData().addAll(devices);
+        }
         mListener.onDevListSizeChanged(mAdapter.getData().isEmpty());
         BridgeService.getInstance().connectDevices(mAdapter.getData());
 
@@ -356,6 +383,35 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         }
     }
 
+    private void refreshDevices(){
+        mAdapter.getData().clear();
+        mAdapter.setEmptyView(emptyView);
+        showEmptyViewProgress(true);
+
+        MyApp.getCloudUtil().getCloudDevices(new CgiCallback(this) {
+            @Override
+            public void onError(Call call, Response response, Exception e) {
+                super.onError(call, response, e);
+                MyApp.showToast(R.string.error_lost_connection);
+            }
+
+            @Override
+            public void onSuccess(String s, Call call, Response response) {
+                Log.e("cloud rsp",s);
+                CloudDevicesResponse rsp = JSONUtil.fromJson(s, CloudDevicesResponse.class);
+                if (rsp == null) {
+                    return;
+                }
+                switch (rsp.getStatus()) {
+                    case 1:
+                        initDeviceAdapter(loadDeviceListByCloud(rsp.getDev()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
 
     private void onServiceReady() {
         List<EdwinDevice> devices = new ArrayList<EdwinDevice>();
@@ -363,9 +419,9 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 
         rvDev.setAdapter(mAdapter);
         mAdapter.setEmptyView(emptyView);
+        showEmptyViewProgress(true);
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnMenuClickListener(this);
-
         mAdapter.notifyDataSetChanged();
 
         MyApp.getCloudUtil().getCloudDevices(new CgiCallback(this) {
@@ -652,17 +708,13 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
                 break;
             case Constants.EdwinEventType.EVENT_GOTO_FOREGROUND:
                 Log.e("event","EVENT_GOTO_FOREGROUND");
-                if( BridgeService.isReady() && mAdapter != null){
-                    if(mAdapter.getData().isEmpty() == false){
-                        Log.e("event","start connect device by list");
-                        BridgeService.getInstance().connectDevices(mAdapter.getData());
-                    }else{
-                        Log.e("event","start refresh device by list");
-                        onServiceReady();
-                    }
+                if( BridgeService.isReady() == false){
+                    Log.e("event","bridge service is ready:["+ BridgeService.isReady()+"] mAdapter is null:[" + mAdapter + "]");
+                    postEdwinEvent(Constants.EdwinEventType.EVENT_GOTO_FOREGROUND);
+                }else{
+                    refreshDevices();
                 }
                 break;
-
             default:
                 break;
         }

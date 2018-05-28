@@ -48,6 +48,7 @@ import com.rl.geye.R;
 import com.rl.geye.adapter.MyFragPageAdapter;
 import com.rl.geye.base.BaseMyAty;
 import com.rl.geye.bean.AppVersionInfo;
+import com.rl.geye.constants.Constants;
 import com.rl.geye.constants.SystemValue;
 import com.rl.geye.db.bean.PhotoVideo;
 import com.rl.geye.logic.DataLogic;
@@ -63,6 +64,7 @@ import com.rl.geye.ui.frag.TabPhotoFrag;
 import com.rl.geye.ui.frag.TabVideoFrag;
 import com.rl.geye.util.PermissionUtil;
 import com.rl.geye.util.PhotoVideoUtil;
+import com.rl.p2plib.BridgeService;
 import com.rl.p2plib.utils.JSONUtil;
 
 import java.io.File;
@@ -445,6 +447,11 @@ public class MainAty extends BaseMyAty implements
         Logger.w("register=" + register);
 //        Logger.w("验证小米推送是否成功:rid=" + rid);
 //        Toast.makeText(MainAty.this,"rid="+rid,Toast.LENGTH_SHORT).show();
+
+        if(BridgeService.isReady() == false){
+            startService(new Intent(Intent.ACTION_MAIN).setClass(MainAty.this, BridgeService.class));
+        }
+        postEdwinEvent(Constants.EdwinEventType.EVENT_GOTO_FOREGROUND);
     }
 
     private void initNetObserver() {
