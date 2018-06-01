@@ -196,7 +196,7 @@ public class DetectSetAty extends BaseP2PAty implements UITableView.TableClickLi
         if (fromIntent != null) {
             isDetect = fromIntent.getBooleanExtra(Constants.BundleKey.KEY_IS_DETECT, true);
             mSysInfo = fromIntent.getParcelableExtra(KEY_SYS_INFO);
-            if (mSysInfo.getSupportWakeUpControl() == 1) {
+            if (mSysInfo != null && mSysInfo.getSupportWakeUpControl() == 1) {
                 getWakeUp();
             }
             if (isDetect) {

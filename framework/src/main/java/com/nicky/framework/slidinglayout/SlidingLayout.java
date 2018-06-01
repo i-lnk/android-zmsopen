@@ -137,11 +137,7 @@ public class SlidingLayout extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
         //实际上整个layout只能存在一个背景和一个前景才有用途
-//        if(getChildCount() > 2){
-//
-//        }
         if (getChildCount() == 0) {
             return;
         }
@@ -151,6 +147,7 @@ public class SlidingLayout extends FrameLayout {
         if (mTargetView == null) {
             return;
         }
+        super.onLayout(changed, left, top, right, bottom);
     }
 
     private void ensureTarget() {

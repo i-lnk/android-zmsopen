@@ -31,11 +31,10 @@ import butterknife.BindView;
  * Created by Nicky on 2016/10/20.
  * 时区选择
  */
-public class TimeZoneAty extends BaseP2PAty {
+public class DevUsrAty extends BaseP2PAty {
 
-
-    @BindView(R.id.rv_timezone)
-    RecyclerView rvZone;
+    @BindView(R.id.rv_users)
+    RecyclerView rvUsers;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     @BindView(R.id.toolbar)
@@ -46,8 +45,6 @@ public class TimeZoneAty extends BaseP2PAty {
 
     private List<DevTimeZone> mZoneList;
     private TimeZoneAdapter mAdapter;
-
-    private DevTimeZone curTimeZone;
 
     private Handler mHandler;
     private BaseQuickAdapter.OnItemClickListener onItemClickListener;
@@ -66,10 +63,7 @@ public class TimeZoneAty extends BaseP2PAty {
 
     @Override
     protected boolean initPrepareData() {
-        if (fromIntent != null) {
-            curTimeZone = fromIntent.getParcelableExtra(Constants.BundleKey.KEY_TIME_ZONE);
-        }
-        return curTimeZone != null && super.initPrepareData();
+        return super.initPrepareData();
     }
 
     @Override
@@ -87,60 +81,15 @@ public class TimeZoneAty extends BaseP2PAty {
     protected void initViewsAndEvents() {
         int[] zones = getResources().getIntArray(R.array.time_zone_val);
         initHandler();
-        mZoneList = new ArrayList<>();
-        for (int zone : zones) {
-            DevTimeZone timeZone = new DevTimeZone(zone);
-            mZoneList.add(timeZone);
-        }
-        if (mZoneList.contains(curTimeZone)) {
-            mZoneList.remove(curTimeZone);
-            mZoneList.add(0, curTimeZone);
-        }
 
         mAdapter = new TimeZoneAdapter(mZoneList);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvZone.setLayoutManager(layoutManager);
-        rvZone.setItemAnimator(new DefaultItemAnimator());
-
-        rvZone.setAdapter(mAdapter);
-        mAdapter.chooseItem(curTimeZone);
-
-
-        onItemClickListener = new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, final int position) {
-                if (ClickUtil.isFastClick(getActivity(), view))
-                    return;
-                if (!isOnline)
-                    return;
-//                mAdapter.chooseItem(position);
-                if (!curTimeZone.equals(mZoneList.get(position))) {
-                    setTimeZone(mZoneList.get(position).getTimezone());
-                    opTime = SystemClock.elapsedRealtime();
-                    showLoadDialog(new EdwinTimeoutCallback(5000) {
-                        @Override
-                        public void onTimeOut() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    hideLoadDialog();
-                                    BaseApp.showToast(R.string.time_out);
-                                }
-                            });
-
-                        }
-                    }, null);
-                }
-
-
-            }
-        };
-        mAdapter.setOnItemClickListener(onItemClickListener);
-
+        rvUsers.setLayoutManager(layoutManager);
+        rvUsers.setItemAnimator(new DefaultItemAnimator());
+        rvUsers.setAdapter(mAdapter);
         onP2PStatusChanged();
-
     }
 
     @Override
@@ -154,30 +103,6 @@ public class TimeZoneAty extends BaseP2PAty {
     private void setTimeZone(int timeZone) {
         ApiMgrV2.setTimeZone(mDevice.getDevId(), timeZone);
     }
-
-    @Override
-    protected MyP2PCallBack getP2PCallBack() {
-
-        return new MyP2PCallBack() {
-
-
-            @Override
-            public void onSetTimeZone(String did, int msgType, DevTimeZone timeZone) {
-                super.onSetTimeZone(did, msgType, timeZone);
-                if (timeZone != null) {
-                    Message msg = Message.obtain();
-                    msg.what = R.id.msg_update_time_zone;
-                    msg.obj = timeZone;
-
-                    if (SystemClock.elapsedRealtime() - opTime < 800)
-                        mHandler.sendMessageDelayed(msg, 500);
-                    else
-                        mHandler.sendMessage(msg);
-                }
-            }
-        };
-    }
-
 
     private void initHandler() {
         mHandler = new Handler(Looper.getMainLooper()) {
@@ -194,7 +119,6 @@ public class TimeZoneAty extends BaseP2PAty {
                             finish();
                         }
                         break;
-
                 }
             }
         };

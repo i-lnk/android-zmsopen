@@ -247,6 +247,7 @@
     <string name="dev_set_pwd">Modify password</string>
     <string name="cur_wifi">Current WiFi</string>
     <string name="dev_name">Device Name</string>
+    <string name="dev_user">Device User</string>
     <string name="motion_detect">Motion Detection</string>
     <string name="missed">Missed</string>
     <string name="answered">Answered</string>

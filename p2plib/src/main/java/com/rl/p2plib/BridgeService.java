@@ -1,12 +1,15 @@
 package com.rl.p2plib;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -90,7 +93,6 @@ public class BridgeService extends Service implements P2PJniCallBack {
 //	private Object[] mStartForegroundArgs = new Object[2];
 //	private Object[] mStopForegroundArgs = new Object[1];
 
-
     public int getDeviceStatus(String did) {
         int status = P2PConstants.P2PStatus.UNKNOWN;
         String key = did.replace("-", "");
@@ -99,7 +101,6 @@ public class BridgeService extends Service implements P2PJniCallBack {
         }
         return status;
     }
-
 
     /**
      * 服务是否已启动
@@ -110,7 +111,6 @@ public class BridgeService extends Service implements P2PJniCallBack {
 
     private static PushCallback mPushCallback;
     private static Class<?> mClickReceiverCls;
-
 
     /***** 推送处理 *****************/
     public static synchronized void init(Class<?> clickReceiverCls, PushCallback callback) {
@@ -124,12 +124,32 @@ public class BridgeService extends Service implements P2PJniCallBack {
         return new ControllerBinder();
     }
 
-
     /** */
     class ControllerBinder extends Binder {
         public BridgeService getBridgeService() {
             return BridgeService.this;
         }
+    }
+
+    public void createNotification(){
+        //使用兼容版本
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this);
+        //设置状态栏的通知图标
+        builder.setSmallIcon(R.mipmap.app_geye);
+        //设置通知栏横条的图标
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.app_geye));
+        //禁止用户点击删除按钮删除
+        builder.setAutoCancel(false);
+        //禁止滑动删除
+        builder.setOngoing(true);
+        //右上角的时间显示
+        builder.setShowWhen(true);
+        //设置通知栏的标题内容
+        builder.setContentTitle("I am Foreground Service!!!");
+        //创建通知
+        Notification notification = builder.build();
+        //设置为前台服务
+        startForeground(0x0001,notification);
     }
 
     @Override
@@ -141,15 +161,14 @@ public class BridgeService extends Service implements P2PJniCallBack {
             devLock = new ReentrantLock(); //设备状态变化
         initP2P();
         registerReceiver();
-        startForeground();
         instance = this;
+        createNotification();
 
         XLog.i(TAG, "------------------> onCreate() END");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         return Service.START_STICKY;
     }
 
@@ -235,7 +254,6 @@ public class BridgeService extends Service implements P2PJniCallBack {
 
 //	private RebootReceiver mRebootReceiver;
     private void registerReceiver() {
-
 //		if(!EventBus.getDefault().isRegistered(this))
 //		{
 //			EventBus.getDefault().register(this);

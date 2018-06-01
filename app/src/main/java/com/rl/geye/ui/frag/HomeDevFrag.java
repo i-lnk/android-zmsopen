@@ -270,7 +270,6 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         rvDev.setLayoutManager(layoutManager);
         rvDev.setItemAnimator(new DefaultItemAnimator());
 
-
         if (BridgeService.isReady()) {
             onServiceReady();
         } else {

@@ -87,11 +87,12 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
     @BindView(R.id.snackbar_container)
     CoordinatorLayout snackBarContainer;
     private CustomTableItem itemName;   // 设备名称
-    private CustomTableItem itemBg;   // 设备背景
-    private CustomTableItem itemPwd;   // 修改密码
+    private CustomTableItem itemUser;   // 设备用户
+    private CustomTableItem itemBg;     // 设备背景
+    private CustomTableItem itemPwd;    // 修改密码
     private CustomTableItem itemDetect; // 移动侦测
     private CustomTableItem itemRecord; // 自动录像
-    private CustomTableItem itemPower; // 电源频率
+    private CustomTableItem itemPower;  // 电源频率
     private CustomTableItem itemVoice;
     private CustomTableItem itemTimeZone;
     private CustomTableItem itemLanguage;
@@ -151,10 +152,10 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
 
         tvId.setText("ID: " + mDevice.getDevId());
 
-
         itemName = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
-        itemBg = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
-        itemPwd = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
+        itemUser = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
+        itemBg   = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
+        itemPwd  = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
 
         itemDetect = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
         itemRecord = new CustomTableItem(getActivity(), CustomTableItem.ITEM_TYPE_COMMON);
@@ -162,6 +163,9 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
         itemName.setName(getStringForFrag(R.string.dev_name));
         itemName.setIconImageResource(R.mipmap.a2_ic_set_name);
         itemName.setValue(mDevice.getName());
+
+        itemUser.setName(getStringForFrag(R.string.dev_user));
+        itemUser.setIconImageResource(R.mipmap.a0_user);
 
         itemBg.setName(getStringForFrag(R.string.dev_set_bg));
         itemBg.setIconImageResource(R.mipmap.a2_ic_set_bg);
@@ -212,6 +216,7 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
         tb01.clear();
         tb01.addViewItem(new ViewItem(itemBg, R.id.tb_set_bg));
         tb01.addViewItem(new ViewItem(itemName, R.id.tb_set_name));
+        tb01.addViewItem(new ViewItem(itemUser, R.id.tb_set_user));
         tb01.addViewItem(new ViewItem(itemPwd, R.id.tb_set_pwd));
         tb01.commit();
 
@@ -349,6 +354,9 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
         switch (view.getViewId()) {
             case R.id.tb_set_name:
                 onClickDevName();
+                break;
+            case R.id.tb_set_user:
+                gotoActivityForResult(DetectSetAty.class, REQUEST_CODE_DETECT, bundle);
                 break;
             case R.id.tb_set_pwd:
                 bundle.putParcelable(Constants.BundleKey.KEY_DEV_INFO, mDevice);

@@ -248,6 +248,7 @@
     <string name="dev_set_pwd">修改密码</string>
     <string name="cur_wifi">当前WiFi</string>
     <string name="dev_name">设备名</string>
+    <string name="dev_user">设备用户</string>
     <string name="motion_detect">移动侦测</string>
     <string name="missed">未接听</string>
     <string name="answered">已接听</string>

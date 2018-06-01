@@ -24,6 +24,7 @@
     <item name="tb_set_exit" type="id" />
 
     <item name="tb_set_name" type="id" />
+    <item name="tb_set_user" type="id" />
     <item name="tb_set_pwd" type="id" />
     <item name="tb_set_qr" type="id" />
     <item name="tb_set_bg" type="id" />
