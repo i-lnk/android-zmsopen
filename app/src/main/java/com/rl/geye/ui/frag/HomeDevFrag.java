@@ -124,6 +124,7 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
      * empty vied
      */
     View emptyView;
+    View progressView;
     TextView tvWelcome;
     RippleView lyAdd;
     RippleView lyScan;
@@ -287,26 +288,9 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 //        initPushParam();
     }
 
-    private void showEmptyViewProgress(boolean enable){
-        ViewGroup vg = (ViewGroup) ((ViewGroup)emptyView).getChildAt(0);
-        int progressEnable = View.GONE;
-        int viewsEnable = View.GONE;
-        if(enable){
-            progressEnable = View.VISIBLE;
-            viewsEnable = View.GONE;
-        }else{
-            progressEnable = View.GONE;
-            viewsEnable = View.VISIBLE;
-        }
-
-        for(int i = 0;i < vg.getChildCount();i++){
-            vg.getChildAt(i).setVisibility(viewsEnable);
-        }
-        pbDevicesLoading.setVisibility(progressEnable);
-    }
-
     private void initEmptyView() {
         emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_dev, (ViewGroup) rvDev.getParent(), false);
+        progressView = getActivity().getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) rvDev.getParent(), false);
 
         tvWelcome = emptyView.findViewById(R.id.tv_welcome);
         lyAdd = emptyView.findViewById(R.id.ly_add);
@@ -344,33 +328,45 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             edwinDevice.setDevId(cloudDevice.getDevID());
             edwinDevice.setType(cloudDevice.getDevType());
             edwinDevice.setDefaultName(edwinDevice.getDevId(),edwinDevice.getType());
+            edwinDevice.setOwnerid(MyApp.getCloudUser().getId());
+            edwinDevice.setShareable(cloudDevice.getUserType() == 0);
+            edwinDevice.setUser("");
+            edwinDevice.setPwd("");
+            edwinDevice.setUserPwdOK(false);
+
             int pos = localeDevices.indexOf(edwinDevice);
+
             if(mAdapter.getData().contains(edwinDevice)) continue;
-            if(pos < 0){
-                try{
-                    edwinDevice.setOwnerid(MyApp.getCloudUser().getId());
-                    edwinDevice.setUserPwdOK(false);
-                    edwinDevice.setUser("");
-                    edwinDevice.setPwd("");
-                    edwinDevice.setShareable(cloudDevice.getUserType() == 0);
-                    MyApp.getDaoSession().getEdwinDeviceDao().insert(edwinDevice);
-                    insertDevices.add(edwinDevice);
-                }catch (SQLiteException sqle){
-                    Log.e("sqlte","insert cloud device failed with error:" + sqle.getLocalizedMessage());
+            if(pos >= 0){
+                edwinDevice.setUser(localeDevices.get(pos).getName());
+                edwinDevice.setPwd(localeDevices.get(pos).getPwd());
+                edwinDevice.setBgPath(localeDevices.get(pos).getBgPath());
+                edwinDevice.setName(localeDevices.get(pos).getName());
+
+                if(edwinDevice.getPwd().isEmpty() == false){
+                    edwinDevice.setUserPwdOK(true);
                 }
-            }else{
-                insertDevices.add(localeDevices.get(pos));
+            }
+
+            try {
+                // 更新数据库的设备
+                if(pos >= 0) {
+                    MyApp.getDaoSession().getEdwinDeviceDao().delete(localeDevices.get(pos));
+                }
+                MyApp.getDaoSession().getEdwinDeviceDao().insert(edwinDevice);
+                insertDevices.add(edwinDevice);
+            }catch (SQLiteException sqle){
+                Log.e("sqlte","insert cloud device failed with error:" + sqle.getLocalizedMessage());
+                continue;
             }
         }
-
-
 
         return insertDevices;
     }
 
     private void initDeviceAdapter(List<EdwinDevice> devices){
         if(devices.isEmpty()){
-            showEmptyViewProgress(false);
+            mAdapter.setEmptyView(emptyView);
         }else{
             mAdapter.getData().addAll(devices);
         }
@@ -384,8 +380,7 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 
     private void refreshDevices(){
         mAdapter.getData().clear();
-        mAdapter.setEmptyView(emptyView);
-        showEmptyViewProgress(true);
+        mAdapter.setEmptyView(progressView);
 
         MyApp.getCloudUtil().getCloudDevices(new CgiCallback(this) {
             @Override
@@ -417,8 +412,7 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         mAdapter = new DeviceAdapter(devices);
 
         rvDev.setAdapter(mAdapter);
-        mAdapter.setEmptyView(emptyView);
-        showEmptyViewProgress(true);
+        mAdapter.setEmptyView(progressView);
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnMenuClickListener(this);
         mAdapter.notifyDataSetChanged();
@@ -1074,6 +1068,11 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 
     @Override
     public void onSetClick(EdwinDevice data, int position) {
+        if(data.getShareable() == false) {
+            SnackbarUtil.ShortSnackbar(snackBarContainer, getStringForFrag(R.string.error_no_permission)).show();
+            return;
+        }
+
         Bundle bundle = new Bundle();
         bundle.putParcelable(Constants.BundleKey.KEY_DEV_INFO, data);
         bundle.putBoolean(Constants.BundleKey.KEY_DEV_ONLINE, data.isOnline());
@@ -1082,6 +1081,11 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
 
     @Override
     public void onFileClick(EdwinDevice data, int position) {
+        if(data.getShareable() == false) {
+            SnackbarUtil.ShortSnackbar(snackBarContainer, getStringForFrag(R.string.error_no_permission)).show();
+            return;
+        }
+
         if (isConnecting(data)) {
             return;
         }

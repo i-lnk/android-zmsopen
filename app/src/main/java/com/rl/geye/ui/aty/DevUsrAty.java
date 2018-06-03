@@ -8,7 +8,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -16,16 +19,25 @@ import com.edwintech.vdp.jni.ApiMgrV2;
 import com.rl.commons.BaseApp;
 import com.rl.commons.interf.EdwinTimeoutCallback;
 import com.rl.commons.utils.ClickUtil;
+import com.rl.geye.MyApp;
 import com.rl.geye.R;
+import com.rl.geye.adapter.CloudUsersAdapter;
 import com.rl.geye.adapter.TimeZoneAdapter;
 import com.rl.geye.base.BaseP2PAty;
+import com.rl.geye.bean.CloudDevicesResponse;
 import com.rl.geye.constants.Constants;
+import com.rl.geye.db.bean.CloudUser;
+import com.rl.geye.db.bean.EdwinDevice;
+import com.rl.geye.util.CgiCallback;
 import com.rl.p2plib.bean.DevTimeZone;
+import com.rl.p2plib.utils.JSONUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import okhttp3.Call;
+import okhttp3.Response;
 
 /**
  * Created by Nicky on 2016/10/20.
@@ -43,8 +55,10 @@ public class DevUsrAty extends BaseP2PAty {
     @BindView(R.id.ly_all)
     View lyAll;
 
-    private List<DevTimeZone> mZoneList;
-    private TimeZoneAdapter mAdapter;
+    View progressView;
+
+    private List<CloudUser> mUsers;
+    private CloudUsersAdapter mAdapter;
 
     private Handler mHandler;
     private BaseQuickAdapter.OnItemClickListener onItemClickListener;
@@ -53,12 +67,12 @@ public class DevUsrAty extends BaseP2PAty {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.aty_time_zone;
+        return R.layout.aty_dev_usr;
     }
 
     @Override
     protected void onP2PStatusChanged() {
-        mAdapter.setOnline(isOnline);
+
     }
 
     @Override
@@ -74,54 +88,99 @@ public class DevUsrAty extends BaseP2PAty {
     @Override
     protected void initToolBar() {
         initCommonToolBar(toolbar);
-        tvTitle.setText(R.string.time_zone);
+        tvTitle.setText(R.string.dev_user);
+    }
+
+    public class ListUser{
+        private String username;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+    }
+
+    public class CloudUserListByIDResponse{
+        private int status;
+        private int msg;
+        private int userNo;
+        private List<ListUser> users;
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public List<ListUser> getUsers() {
+            return users;
+        }
+
+        public void setUsers(List<ListUser> users) {
+            this.users = users;
+        }
+
+        public int getMsg() {
+            return msg;
+        }
+
+        public void setMsg(int msg) {
+            this.msg = msg;
+        }
+
+        public int getUserNo() {
+            return userNo;
+        }
+
+        public void setUserNo(int userNo) {
+            this.userNo = userNo;
+        }
     }
 
     @Override
     protected void initViewsAndEvents() {
-        int[] zones = getResources().getIntArray(R.array.time_zone_val);
-        initHandler();
+        progressView = getActivity().getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) rvUsers.getParent(), false);
+        mAdapter = new CloudUsersAdapter(new ArrayList<String>());
+        mAdapter.setEmptyView(progressView);
 
-        mAdapter = new TimeZoneAdapter(mZoneList);
+        MyApp.getCloudUtil().getUsersByDevID(mDevice.getDevId(),new CgiCallback(this) {
+            @Override
+            public void onError(Call call, Response response, Exception e) {
+                super.onError(call, response, e);
+                MyApp.showToast(R.string.error_lost_connection);
+            }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvUsers.setLayoutManager(layoutManager);
-        rvUsers.setItemAnimator(new DefaultItemAnimator());
-        rvUsers.setAdapter(mAdapter);
-        onP2PStatusChanged();
+            @Override
+            public void onSuccess(String s, Call call, Response response) {
+                Log.e("cloud rsp",s);
+                CloudUserListByIDResponse rsp = JSONUtil.fromJson(s, CloudUserListByIDResponse.class);
+                if (rsp == null) {
+                    MyApp.showToast(R.string.error_no_valid_user);
+                    return;
+                }
+                switch (rsp.getStatus()) {
+                    case 1:
+                        mAdapter.getData().clear();
+                        for(ListUser listUser:rsp.users){
+                            mAdapter.getData().add(listUser.getUsername());
+                        }
+                        rvUsers.setAdapter(mAdapter);
+                        break;
+                    default:
+                        MyApp.showToast(R.string.error_no_valid_user);
+                        break;
+                }
+            }
+        });
     }
 
     @Override
     protected void onClickView(View v) {
 
     }
-
-    /**
-     * 设置时区
-     */
-    private void setTimeZone(int timeZone) {
-        ApiMgrV2.setTimeZone(mDevice.getDevId(), timeZone);
-    }
-
-    private void initHandler() {
-        mHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case R.id.msg_update_time_zone:
-                        if (mAdapter != null) {
-                            hideLoadDialog();
-                            mAdapter.chooseItem((DevTimeZone) msg.obj);
-                            fromIntent.putExtra(Constants.BundleKey.KEY_TIME_ZONE, (DevTimeZone) msg.obj);
-                            setResult(RESULT_OK, fromIntent);
-                            finish();
-                        }
-                        break;
-                }
-            }
-        };
-    }
-
 }

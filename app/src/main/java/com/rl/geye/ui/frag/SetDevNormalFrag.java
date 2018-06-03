@@ -35,6 +35,7 @@ import com.rl.geye.image.ImageUtil;
 import com.rl.geye.net.NetUrl;
 import com.rl.geye.net.callback.MyStringCallback;
 import com.rl.geye.ui.aty.DetectSetAty;
+import com.rl.geye.ui.aty.DevUsrAty;
 import com.rl.geye.ui.aty.ModifyPwdAty;
 import com.rl.geye.ui.aty.SDCardAty;
 import com.rl.geye.ui.aty.TimeZoneAty;
@@ -356,7 +357,8 @@ public class SetDevNormalFrag extends BaseP2PFrag implements UITableView.TableCl
                 onClickDevName();
                 break;
             case R.id.tb_set_user:
-                gotoActivityForResult(DetectSetAty.class, REQUEST_CODE_DETECT, bundle);
+                bundle.putParcelable(Constants.BundleKey.KEY_DEV_INFO, mDevice);
+                gotoActivity(DevUsrAty.class,bundle);
                 break;
             case R.id.tb_set_pwd:
                 bundle.putParcelable(Constants.BundleKey.KEY_DEV_INFO, mDevice);

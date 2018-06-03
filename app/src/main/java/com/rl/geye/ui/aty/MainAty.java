@@ -451,7 +451,6 @@ public class MainAty extends BaseMyAty implements
         if(BridgeService.isReady() == false){
             startService(new Intent(Intent.ACTION_MAIN).setClass(MainAty.this, BridgeService.class));
         }
-        postEdwinEvent(Constants.EdwinEventType.EVENT_GOTO_FOREGROUND);
     }
 
     private void initNetObserver() {

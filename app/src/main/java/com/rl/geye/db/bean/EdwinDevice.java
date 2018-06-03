@@ -197,6 +197,8 @@ public class EdwinDevice implements Cloneable, Parcelable, IP2PDevice, MultiItem
 
         String dstID = null;
 
+        boolean result = true;
+
         if (o.getClass() == CloudDevice.class){
             CloudDevice that = (CloudDevice)o;
             dstID = that.getDevID();

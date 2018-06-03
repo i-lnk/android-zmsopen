@@ -159,4 +159,20 @@ public class CloudUtil {
                 .params(requestParams)
                 .execute(call);
     }
+
+    public synchronized void getUsersByDevID(String devID,CgiCallback call){
+        Map<String, String> requestParams = new HashMap<>();
+        requestParams.put("devId", devID);
+        requestParams.put("username", username);
+        requestParams.put("accessToken", accessToken);
+        String mGetUsersByDevID = Constants.CloudCgi.CgiGetUsersByDevID;
+
+        Log.e("cloud","get users list by device:["+ devID +"] from user:[" + username + "]");
+
+        OkGo.delete(mGetUsersByDevID);
+        OkGo.post(mGetUsersByDevID)
+                .tag(this)
+                .params(requestParams)
+                .execute(call);
+    }
 }

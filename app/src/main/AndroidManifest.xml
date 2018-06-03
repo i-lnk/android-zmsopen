@@ -107,6 +107,12 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ui.aty.DevUsrAty"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.NoTrans"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".ui.aty.ChooseAddModeAty"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.NoTrans" />

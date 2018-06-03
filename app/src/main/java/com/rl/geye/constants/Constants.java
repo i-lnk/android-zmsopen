@@ -241,5 +241,6 @@ public class Constants {
         public static final String CgiDelDevice = CgiBase + "delDev.php";
         public static final String CgiGetRecord = CgiBase + "getDevRecords.php";
         public static final String CgiAddShareCode = CgiBase + "addShareCode.php";
+        public static final String CgiGetUsersByDevID = CgiBase + "getUserByDevId.php";
     }
 }
