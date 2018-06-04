@@ -104,13 +104,19 @@ public class CloudUtil {
         .execute(call);
     }
 
-    public synchronized void removeCloudDevice(String deviceID,CgiCallback call){
+    public void removeCloudDevice(String deviceID, CgiCallback call){
+        removeCloudDevice(deviceID,username,call);
+    }
+
+    public synchronized void removeCloudDevice(String deviceID, String username, CgiCallback call){
 
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put("username", username);
         requestParams.put("dev", deviceID);
         requestParams.put("accessToken",accessToken);
         String mDelDeviceCgi = Constants.CloudCgi.CgiDelDevice;
+
+        Log.e("cloud","delete user:[" + username + "] from device:[" + deviceID + "]");
 
         OkGo.delete(mDelDeviceCgi);
         OkGo.post(mDelDeviceCgi)

@@ -1,8 +1,10 @@
 package com.rl.geye.ui.aty;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaScannerConnection;
@@ -387,9 +389,28 @@ public class MainAty extends BaseMyAty implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(true);
+//          moveTaskToBack(true);
+            AlertDialog.Builder exitDlg = new AlertDialog.Builder(this);
+            exitDlg.setTitle(R.string.str_exit);
+            exitDlg.setMessage(R.string.tips_exit_app);
+            exitDlg.setPositiveButton(R.string.str_ok,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MainAty.super.onBackPressed();
+                        }
+                    });
+            exitDlg.setNegativeButton(R.string.str_cancel,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //...To-do
+                        }
+                    });
+            exitDlg.show();
             return true;
         }
+
         return super.onKeyDown(keyCode, event);
     }
 

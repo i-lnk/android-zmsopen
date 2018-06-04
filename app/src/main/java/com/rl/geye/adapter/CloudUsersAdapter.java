@@ -1,22 +1,17 @@
 package com.rl.geye.adapter;
 
-
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.rl.commons.utils.ClickUtil;
 import com.rl.geye.R;
-import com.rl.geye.db.bean.EdwinDevice;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,20 +24,19 @@ import butterknife.ButterKnife;
  */
 public class CloudUsersAdapter extends BaseQuickAdapter<String, CloudUsersAdapter.MyViewHolder> {
     private List<String> usernames;
-
-    @Override
-    public void onBindViewHolder(MyViewHolder myViewHolder, int i) {
-
-    }
-
-    @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        return null;
-    }
+    private OnMenuClickListener mListener;
 
     public CloudUsersAdapter(List<String> usernames) {
         super(R.layout.item_rv_user, usernames);
         this.usernames = usernames;
+    }
+
+    public interface OnMenuClickListener {
+        void onDeleteClick(String username,int pos);
+    }
+
+    public void setOnMenuClickListener(OnMenuClickListener listener) {
+        mListener = listener;
     }
 
     public class MenuClickListener implements View.OnClickListener {
@@ -60,38 +54,51 @@ public class CloudUsersAdapter extends BaseQuickAdapter<String, CloudUsersAdapte
                 return;
             switch (v.getId()) {
                 case R.id.ic_del_usr:
-                    Log.e("event click","click delete user button");
+                    Log.e("event click","click delete user:[" + username + "] button");
+                    mListener.onDeleteClick(username,position);
                     break;
             }
         }
     }
 
     @Override
-    protected void convert(MyViewHolder myViewHolder, String s) {
-        if(s != null && s.isEmpty() == false){
-            myViewHolder.tvName.setText(s);
-            final int realPosition = myViewHolder.getLayoutPosition() - getHeaderLayoutCount();
+    protected void convert(MyViewHolder myViewHolder,String s) {
+        if(s == null) return;
+        if(myViewHolder == null) return;
+
+        Log.e("cloud user adapter","add new user:[" + s + "]");
+
+        if(s.isEmpty() == false){
+            myViewHolder.tvUser.setText(s);
+            int realPosition = myViewHolder.getLayoutPosition() - getHeaderLayoutCount();
             myViewHolder.ivDelete.setOnClickListener(new MenuClickListener(s, realPosition));
         }
     }
 
     @Override
-    public int getItemCount() {
-        return usernames.size();
+    protected View getItemView(int layoutResId, ViewGroup parent) {
+        View view = super.getItemView(layoutResId, parent);
+        view.setTag(R.id.BaseQuickAdapter_databinding_support, 1);
+        return view;
     }
 
     public static class MyViewHolder extends BaseViewHolder {
-
-        @BindView(R.id.iv_item)
-        ImageView ivItem;
-        @BindView(R.id.tv_name)
-        TextView tvName;
+        @BindView(R.id.ly_item)
+        LinearLayout lyItem;
+        @BindView(R.id.tv_user)
+        TextView tvUser;
         @BindView(R.id.ic_del_usr)
         ImageView ivDelete;
+        @BindView(R.id.middle_line)
+        View middleLine;
+        @BindView(R.id.bottom_line)
+        View bottomLine;
+        @BindView(R.id.bg_enable)
+        View bgEnable;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-//            Logger.e("itemView: "+itemView);
+            Log.e("itemView","initialize cloud users adapter view holder");
             if (itemView.getTag(R.id.BaseQuickAdapter_databinding_support) != null) {
                 ButterKnife.bind(this, itemView);
             }

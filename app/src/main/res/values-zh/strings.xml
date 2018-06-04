@@ -433,4 +433,7 @@
     <string name="error_no_permission">没有权限</string>
     <string name="error_no_valid_user">没有有效的用户</string>
     <string name="tips_loading_device">正在刷新设备列表...</string>
+
+    <string name="tips_exit_app">是否退出当前应用，退出应用后将无法收到呼叫请求。</string>
+    <string name="tips_delete_usr">确定删除当前共享用户?</string>
 </resources>

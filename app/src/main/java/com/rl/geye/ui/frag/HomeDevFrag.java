@@ -368,6 +368,7 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         if(devices.isEmpty()){
             mAdapter.setEmptyView(emptyView);
         }else{
+            mAdapter.getData().clear();
             mAdapter.getData().addAll(devices);
         }
         mListener.onDevListSizeChanged(mAdapter.getData().isEmpty());

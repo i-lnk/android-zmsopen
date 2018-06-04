@@ -431,4 +431,7 @@
     <string name="error_no_permission">no permission</string>
     <string name="error_no_valid_user">no valid user</string>
     <string name="tips_loading_device">loading device list...</string>
+
+    <string name="tips_exit_app">Are you sure to exit application? It will close the notification from you device.</string>
+    <string name="tips_delete_usr">Are you sure to delete share user?</string>
 </resources>

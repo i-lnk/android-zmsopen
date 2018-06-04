@@ -39,32 +39,19 @@
                     android:gravity="center_vertical"
                     android:singleLine="true"
                     android:textColor="#444444"
-                    android:textSize="@dimen/text_14"
+                    android:textSize="@dimen/text_18"
                     android:typeface="sans" />
 
-                <TextView
-                    android:id="@+id/tv_desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginTop="2dip"
-                    android:gravity="center_vertical"
-                    android:singleLine="true"
-                    android:textColor="@color/text_hint"
-                    android:textSize="@dimen/text_14"
-                    android:typeface="sans" />
             </LinearLayout>
 
 
             <ImageView
                 android:id="@+id/ic_del_usr"
-                android:layout_width="16dip"
-                android:layout_height="12dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="10dip"
                 android:src="@mipmap/a0_ic_delete" />
-
-
         </LinearLayout>
 
         <View

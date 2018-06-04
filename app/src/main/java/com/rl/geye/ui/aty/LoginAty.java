@@ -67,6 +67,7 @@ public class LoginAty extends AppCompatActivity{
     private TextView mRegisterView;
     private View mProgressView;
     private View mLoginFormView;
+    private Button mEmailSignInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +88,7 @@ public class LoginAty extends AppCompatActivity{
             }
         });
 
-        Button mEmailSignInButton = findViewById(R.id.user_sign_in_button);
+        mEmailSignInButton = findViewById(R.id.user_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -266,62 +267,70 @@ public class LoginAty extends AppCompatActivity{
             String mLoginCgi = Constants.CloudCgi.CgiLogin;
 
             OkGo.post(mLoginCgi)
-                    .tag(this)
-                    .params(requestParams)
-                    .execute(new CgiCallback(this) {
-                        @Override
-                        public void onError(Call call, Response response, Exception e) {
-                            super.onError(call, response, e);
-                            MyApp.showToast(R.string.error_lost_connection);
+                .tag(this)
+                .params(requestParams)
+                .execute(new CgiCallback(this) {
+
+                    @Override
+                    public void onAfter(String s, Exception e) {
+                        super.onAfter(s, e);
+                        mEmailSignInButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                        MyApp.showToast(R.string.error_lost_connection);
+                    }
+
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        CloudCommoResponse loginResponse = JSONUtil.fromJson(s, CloudCommoResponse.class);
+                        Log.e("lwip login response",s );
+                        if(loginResponse == null){
+                            MyApp.showToast(R.string.err_data);
+                            return;
                         }
-
-                        @Override
-                        public void onSuccess(String s, Call call, Response response) {
-                            CloudCommoResponse loginResponse = JSONUtil.fromJson(s, CloudCommoResponse.class);
-                            Log.e("lwip login response",s );
-                            if(loginResponse == null){
-                                return;
-                            }
-                            if(loginResponse.getStatus() == 1){
-                                try {
-                                    CloudUserDao cloudUserDao = MyApp.getDaoSession().getCloudUserDao();
-                                    List<CloudUser> cloudUsers = cloudUserDao.loadAll();
-                                    for(CloudUser user:cloudUsers){
-                                        if(TextUtils.equals(user.getUsername(),mUsername)){
-                                            user.setActived(true);
-                                            MyApp.setCloudUser(user);
-                                            MyApp.getDaoSession().getCloudUserDao().update(user);
-                                            break;
-                                        }
+                        if(loginResponse.getStatus() == 1){
+                            try {
+                                CloudUserDao cloudUserDao = MyApp.getDaoSession().getCloudUserDao();
+                                List<CloudUser> cloudUsers = cloudUserDao.loadAll();
+                                for(CloudUser user:cloudUsers){
+                                    if(TextUtils.equals(user.getUsername(),mUsername)){
+                                        user.setActived(true);
+                                        MyApp.setCloudUser(user);
+                                        MyApp.getDaoSession().getCloudUserDao().update(user);
+                                        break;
                                     }
-
-                                    if(MyApp.getCloudUser() == null) {
-                                        CloudUser cu = new CloudUser();
-                                        cu.setActived(true);
-                                        cu.setUsername(mUsername);
-                                        cu.setPassword(mPassword);
-                                        cloudUserDao.insert(cu);
-                                        MyApp.setCloudUser(cu);
-                                    }
-                                }catch(SQLiteConstraintException e){
-                                    Log.e("sqlite",e.getLocalizedMessage());
                                 }
-                                MyApp.getCloudUtil().setUsername(mUsername);
-                                MyApp.getCloudUtil().setPassword(mPassword);
-                                MyApp.getCloudUtil().setAccessToken(loginResponse.getAccessToken());
-                                Intent mainIntent = new Intent(LoginAty.this,MainAty.class);
-                                startActivity(mainIntent);
-                                finish();
-                                return;
+
+                                if(MyApp.getCloudUser() == null) {
+                                    CloudUser cu = new CloudUser();
+                                    cu.setActived(true);
+                                    cu.setUsername(mUsername);
+                                    cu.setPassword(mPassword);
+                                    cloudUserDao.insert(cu);
+                                    MyApp.setCloudUser(cu);
+                                }
+                            }catch(SQLiteConstraintException e){
+                                Log.e("sqlite",e.getLocalizedMessage());
                             }
-
-                            mPasswordView.setError(getString(R.string.error_incorrect_password));
-                            mPasswordView.requestFocus();
-
-                            Log.e("lwip login request","[" + mUsername + "][" + mPassword + "]");
-                            Log.e("lwip login response","status:[" + loginResponse.getStatus() + "] msg:[" + loginResponse.getMsg() + "]");
+                            MyApp.getCloudUtil().setUsername(mUsername);
+                            MyApp.getCloudUtil().setPassword(mPassword);
+                            MyApp.getCloudUtil().setAccessToken(loginResponse.getAccessToken());
+                            Intent mainIntent = new Intent(LoginAty.this,MainAty.class);
+                            startActivity(mainIntent);
+                            finish();
+                            return;
                         }
-                    });
+
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+
+                        Log.e("lwip login request","[" + mUsername + "][" + mPassword + "]");
+                        Log.e("lwip login response","status:[" + loginResponse.getStatus() + "] msg:[" + loginResponse.getMsg() + "]");
+                    }
+                });
 
             return false;
         }
@@ -329,12 +338,14 @@ public class LoginAty extends AppCompatActivity{
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
+            mEmailSignInButton.setEnabled(false);
             showProgress(false);
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
+            mEmailSignInButton.setEnabled(true);
             showProgress(false);
         }
     }

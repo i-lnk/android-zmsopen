@@ -1,6 +1,7 @@
 package com.rl.geye.adapter;
 
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -100,16 +101,12 @@ public class TimeZoneAdapter extends BaseQuickAdapter<DevTimeZone, TimeZoneAdapt
         @BindView(R.id.bg_enable)
         View bgEnable;
 
-
         public MyViewHolder(View itemView) {
             super(itemView);
-//            Logger.e("itemView: "+itemView);
+            Log.e("itemView","initialize timezone adapter view holder");
             if (itemView.getTag(R.id.BaseQuickAdapter_databinding_support) != null) {
                 ButterKnife.bind(this, itemView);
             }
         }
-
     }
-
-
 }
