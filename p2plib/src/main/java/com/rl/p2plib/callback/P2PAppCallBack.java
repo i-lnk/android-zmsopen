@@ -3,6 +3,7 @@ package com.rl.p2plib.callback;
 import com.rl.p2plib.bean.Battery;
 import com.rl.p2plib.bean.CallAnswer;
 import com.rl.p2plib.bean.DetectInfo;
+import com.rl.p2plib.bean.DevLockResult;
 import com.rl.p2plib.bean.DevSdCard;
 import com.rl.p2plib.bean.DevSysSet;
 import com.rl.p2plib.bean.DevTimeZone;
@@ -191,4 +192,14 @@ public interface P2PAppCallBack {
      * 获取远程唤醒
      */
     void onGetWakeUp(String did, int msgType, WakeUpData wakeUpData);
+
+    /**
+     * 获取锁状态
+     */
+    void onGetLockGoke(String did, int msgType,DevLockResult devLockResult);
+
+    /**
+     * 开锁结果
+     */
+    void onSetLockGoke(String did, int msgType,DevLockResult devLockResult);
 }

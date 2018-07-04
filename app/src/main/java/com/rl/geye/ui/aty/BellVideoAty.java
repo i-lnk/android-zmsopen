@@ -494,6 +494,7 @@ public class BellVideoAty extends BaseP2PAty implements CtrlLayout.AnimationList
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 break;
             case R.id.iv_unlock:
+                ApiMgrV2.setUnlockGoke(mDevice.getDevId(),0,0x1);
                 break;
             case R.id.iv_answer:
                 answer();

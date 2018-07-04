@@ -125,6 +125,4 @@ public class KeepService extends JobService {
             super.handleMessage(msg);
         }
     }
-
-
 }

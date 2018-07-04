@@ -53,6 +53,10 @@ public class CmdConstant {
         public static final int GET_SYS_SET_RESP = 0x855; //获取设备语言返回
 
         public static final int UNLOCK = 0x800;        //开锁
+        public static final int USER_IPCAM_SET_DOOROPEN_REQ		= 0X1810;	//设置开门
+        public static final int USER_IPCAM_SET_DOOROPEN_RESP 	= 0X1811;	//设置开门应答
+        public static final int USER_IPCAM_GET_DOOROPEN_REQ		= 0X1812;	//获取门锁状态
+        public static final int USER_IPCAM_GET_DOOROPEN_RESP 	= 0X1813;	//获取门锁状态应答
 
         public static final int USER_IPCAM_GET_TIMEZONE_REQ = 0x3A0; //获取时区
         public static final int USER_IPCAM_GET_TIMEZONE_RESP = 0x3A1; //获取时区返回

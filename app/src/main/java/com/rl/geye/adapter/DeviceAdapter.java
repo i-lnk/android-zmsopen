@@ -141,8 +141,6 @@ public class DeviceAdapter extends BaseQuickAdapter<EdwinDevice, DeviceAdapter.M
                     resid = R.string.pppp_status_unknown;
             }
 
-            if(data.getPwd().isEmpty())
-                resid = R.string.pppp_status_user_not_login;
             helper.tvStatus.setText(resid);
 
             final int realPosition = helper.getLayoutPosition() - getHeaderLayoutCount();

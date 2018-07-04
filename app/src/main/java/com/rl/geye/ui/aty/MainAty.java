@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -189,6 +190,17 @@ public class MainAty extends BaseMyAty implements
 
     }
 
+    public static String getVerName(Context context) {
+        String verName = "";
+        try {
+            verName = context.getPackageManager().
+                    getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return verName;
+    }
+
     @Override
     protected void initViewsAndEvents() {
         /*
@@ -267,7 +279,8 @@ public class MainAty extends BaseMyAty implements
             });
         }
         Map<String, String> params = new HashMap<>();
-        params.put("appname", "Iguarder");
+        params.put("appname", "zmsopen");
+        params.put("ver", getVerName(this));
         OkGo.<String>get(NetUrl.checkAppUpdate()).tag(this)
                 .params(params)
                 .execute(new StringCallback() {

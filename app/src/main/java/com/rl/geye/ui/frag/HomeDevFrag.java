@@ -307,23 +307,23 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
         lyScan.setOnRippleCompleteListener(mRippleCompleteListener);
     }
 
-    private List<EdwinDevice> loadDeviceListByCloud(List<CloudDevice> remoteDevices){
+    private void loadDeviceListByCloud(List<CloudDevice> remoteDevices){
+        MyApp.getCloudUser().resetDevices();
+        List<EdwinDevice> localeDevices = MyApp.getCloudUser().getDevices();
+        if(localeDevices == null) localeDevices = new ArrayList<>();
         if(remoteDevices == null) remoteDevices = new ArrayList<>();
 
-        List<EdwinDevice> insertDevices = new ArrayList<EdwinDevice>();
-        List<EdwinDevice> localeDevices = MyApp.getCloudUser().getDevices();
-
         // 删除本地数据存在，云端不存在的设备
-        for (int i = 0; i < localeDevices.size(); i++) {
-            if(remoteDevices.contains(localeDevices.get(i)) == false){
-                localeDevices.get(i).setOwnerid(MyApp.getCloudUser().getId());
-                MyApp.getDaoSession().getEdwinDeviceDao().delete(localeDevices.get(i));
-                Log.e("sqlite","delete device which not on cloud database:" +  localeDevices.get(i).getDevId());
-            }
+        for(EdwinDevice edwinDevice:localeDevices){
+           if(remoteDevices.contains(edwinDevice) == false){
+               edwinDevice.setOwnerid(MyApp.getCloudUser().getId());
+               localeDevices.remove(edwinDevice);
+               MyApp.getDaoSession().getEdwinDeviceDao().delete(edwinDevice);
+               Log.e("loadDeviceListByCloud","remove device not on cloud list:" + edwinDevice.getDevId());
+           }
         }
         //
         for (CloudDevice cloudDevice:remoteDevices) {
-            Log.e("loadDeviceListByCloud","ready to insert device:" + cloudDevice.getDevID());
             EdwinDevice edwinDevice = new EdwinDevice();
             edwinDevice.setDevId(cloudDevice.getDevID());
             edwinDevice.setType(cloudDevice.getDevType());
@@ -334,38 +334,32 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             edwinDevice.setPwd("");
             edwinDevice.setUserPwdOK(false);
 
-            int pos = localeDevices.indexOf(edwinDevice);
-
-            if(mAdapter.getData().contains(edwinDevice)) continue;
-            if(pos >= 0){
-                edwinDevice.setUser(localeDevices.get(pos).getName());
-                edwinDevice.setPwd(localeDevices.get(pos).getPwd());
-                edwinDevice.setBgPath(localeDevices.get(pos).getBgPath());
-                edwinDevice.setName(localeDevices.get(pos).getName());
-
-                if(edwinDevice.getPwd().isEmpty() == false){
-                    edwinDevice.setUserPwdOK(true);
-                }
-            }
-
-            try {
-                // 更新数据库的设备
-                if(pos >= 0) {
-                    MyApp.getDaoSession().getEdwinDeviceDao().delete(localeDevices.get(pos));
-                }
-                MyApp.getDaoSession().getEdwinDeviceDao().insert(edwinDevice);
-                insertDevices.add(edwinDevice);
-            }catch (SQLiteException sqle){
-                Log.e("sqlte","insert cloud device failed with error:" + sqle.getLocalizedMessage());
+            if(localeDevices.contains(edwinDevice)){
+                Log.e("loadDeviceListByCloud","device:[" + cloudDevice.getDevID() + "] already exists");
                 continue;
             }
+
+            Log.e("loadDeviceListByCloud","ready to insert device:" + cloudDevice.getDevID());
+
+            localeDevices.add(edwinDevice);
         }
 
-        return insertDevices;
+        try {
+            // 更新数据库的设备
+            if(localeDevices.size() > 0)
+                MyApp.getDaoSession().getEdwinDeviceDao().insertInTx(localeDevices);
+        }catch (SQLiteException sqle){
+            Log.e("sqlte","insert cloud device failed with error:" + sqle.getLocalizedMessage());
+        }
+
+        return;
     }
 
-    private void initDeviceAdapter(List<EdwinDevice> devices){
-        if(devices.isEmpty()){
+    private void initDeviceAdapter(){
+        MyApp.getCloudUser().resetDevices();
+        List<EdwinDevice> devices = MyApp.getCloudUser().getDevices();
+
+        if(devices == null || devices.isEmpty()){
             mAdapter.setEmptyView(emptyView);
         }else{
             mAdapter.getData().clear();
@@ -388,6 +382,13 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             public void onError(Call call, Response response, Exception e) {
                 super.onError(call, response, e);
                 MyApp.showToast(R.string.error_lost_connection);
+                mAdapter.setEmptyView(emptyView);
+            }
+
+            @Override
+            public void onAfter(String s, Exception e) {
+                super.onAfter(s, e);
+                mAdapter.setEmptyView(emptyView);
             }
 
             @Override
@@ -395,13 +396,16 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
                 Log.e("cloud rsp",s);
                 CloudDevicesResponse rsp = JSONUtil.fromJson(s, CloudDevicesResponse.class);
                 if (rsp == null) {
+                    MyApp.showToast(R.string.err_data);
                     return;
                 }
                 switch (rsp.getStatus()) {
                     case 1:
-                        initDeviceAdapter(loadDeviceListByCloud(rsp.getDev()));
+                        loadDeviceListByCloud(rsp.getDev());
+                        initDeviceAdapter();
                         break;
                     default:
+                        MyApp.showToast(R.string.err_data);
                         break;
                 }
             }
@@ -426,17 +430,26 @@ public class HomeDevFrag extends BaseMyFrag implements View.OnClickListener, Bas
             }
 
             @Override
+            public void onAfter(String s, Exception e) {
+                super.onAfter(s, e);
+                mAdapter.setEmptyView(emptyView);
+            }
+
+            @Override
             public void onSuccess(String s, Call call, Response response) {
                 Log.e("cloud rsp",s);
                 CloudDevicesResponse rsp = JSONUtil.fromJson(s, CloudDevicesResponse.class);
                 if (rsp == null) {
+                    MyApp.showToast(R.string.err_data);
                     return;
                 }
                 switch (rsp.getStatus()) {
                     case 1:
-                        initDeviceAdapter(loadDeviceListByCloud(rsp.getDev()));
+                        loadDeviceListByCloud(rsp.getDev());
+                        initDeviceAdapter();
                         break;
                     default:
+                        MyApp.showToast(R.string.err_data);
                         break;
                 }
             }

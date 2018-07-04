@@ -214,6 +214,27 @@ public class ApiMgrV2 {
     }
 
     /**
+     * 开锁
+     */
+    public static void setUnlockGoke(String devId, int doorNum,int doorMode) {
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("doornumb", String.valueOf(doorNum));
+        params.put("openmode", String.valueOf(doorMode));
+        String msg = "setlock.cgi?" + getParamsStr(params);
+        sendCMDInThreadPool(devId, CmdConstant.CmdType.USER_IPCAM_SET_DOOROPEN_REQ, msg, null, 0);
+    }
+
+    /**
+     * 获取锁状态
+     */
+    public static void getUnlockGoke(String devId, int doorNum) {
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("doornumb", String.valueOf(doorNum));
+        String msg = "getlock.cgi?" + getParamsStr(params);
+        sendCMDInThreadPool(devId, CmdConstant.CmdType.USER_IPCAM_GET_DOOROPEN_REQ, msg, null, 0);
+    }
+
+    /**
      * 码流控制
      *
      * @param channel 0：主码流  1：次码流

@@ -324,8 +324,18 @@ public class LoginAty extends AppCompatActivity{
                             return;
                         }
 
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
+                        switch(loginResponse.getMsg()){
+                            case 15:
+                                MyApp.showToast(R.string.error_incorrect_username_or_password);
+//                                mPasswordView.setError(getString(R.string.error_incorrect_username_or_password));
+//                                mPasswordView.requestFocus();
+                                break;
+                            case 16:
+                                break;
+                            default:
+                                MyApp.showToast(R.string.err_data);
+                                break;
+                        }
 
                         Log.e("lwip login request","[" + mUsername + "][" + mPassword + "]");
                         Log.e("lwip login response","status:[" + loginResponse.getStatus() + "] msg:[" + loginResponse.getMsg() + "]");

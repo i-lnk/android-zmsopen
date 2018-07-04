@@ -411,6 +411,7 @@
     <string name="error_invalid_username">This username is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_incorrect_username_or_password">This username or password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing username
         completions."
@@ -434,4 +435,6 @@
 
     <string name="tips_exit_app">Are you sure to exit application? It will close the notification from you device.</string>
     <string name="tips_delete_usr">Are you sure to delete share user?</string>
+
+    <string name="update_failed_by_low_power">Low power,can\'t upgrade now.</string>
 </resources>

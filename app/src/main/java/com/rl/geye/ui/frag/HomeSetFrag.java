@@ -81,7 +81,6 @@ public class HomeSetFrag extends BaseMyFrag implements UITableView.TableClickLis
                     vibrateEnable = isChecked;
                     DataLogic.saveVibrateEnable(isChecked);
                     break;
-
                 case R.id.tb_set_id_no_disturb:
                     noDisturbEnable = isChecked;
                     DataLogic.saveNoDisturb(isChecked);
@@ -129,7 +128,6 @@ public class HomeSetFrag extends BaseMyFrag implements UITableView.TableClickLis
         itemVibrate.setOnSwitchListener(R.id.tb_set_id_vibrate, mOnSwitchListener);
         itemVibrate.setChecked(vibrateEnable);
 
-
         itemNoDisturb.setName(getStringForFrag(R.string.status_block));
         itemNoDisturb.setIconImageResource(R.mipmap.ic_set_no_disturb);
         itemNoDisturb.setOnSwitchListener(R.id.tb_set_id_no_disturb, mOnSwitchListener);
@@ -163,7 +161,6 @@ public class HomeSetFrag extends BaseMyFrag implements UITableView.TableClickLis
 
         table01.setTableClickListener(this);
         table02.setTableClickListener(this);
-
     }
 
     @Override

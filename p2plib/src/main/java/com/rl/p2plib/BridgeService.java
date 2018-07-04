@@ -2,10 +2,13 @@ package com.rl.p2plib;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -75,32 +78,6 @@ public class BridgeService extends Service implements P2PJniCallBack {
     private HashMap<String, Integer> statusMap = new HashMap<>();
 
     private Lock devLock = new ReentrantLock(); //设备状态变化
-//	private List<EdwinDevice> mDeviceList;//数据库中的设备列表
-
-//	private PendingIntent mNotifContentIntent;
-//
-//	private final static int NOTIF_ID = 1;
-//	private NotificationManager mCustomMgr;
-//	private Notification mNotif;
-//
-//	private static final Class<?>[] mSetFgSign = new Class[] {boolean.class};
-//	private static final Class<?>[] mStartFgSign = new Class[] {int.class, Notification.class};
-//	private static final Class<?>[] mStopFgSign = new Class[] {boolean.class};
-//	private Method mSetForeground;
-//	private Method mStartForeground;
-//	private Method mStopForeground;
-//	private Object[] mSetForegroundArgs = new Object[1];
-//	private Object[] mStartForegroundArgs = new Object[2];
-//	private Object[] mStopForegroundArgs = new Object[1];
-
-    public int getDeviceStatus(String did) {
-        int status = P2PConstants.P2PStatus.UNKNOWN;
-        String key = did.replace("-", "");
-        if (!StringUtils.isEmpty(did) && statusMap.containsKey(key)) {
-            status = statusMap.get(key);
-        }
-        return status;
-    }
 
     /**
      * 服务是否已启动
@@ -132,8 +109,22 @@ public class BridgeService extends Service implements P2PJniCallBack {
     }
 
     public void createNotification(){
+        String CHANNEL_ID = getString(R.string.pkg_name);
+        String CHANNEL_NAME = "channel one";
+        NotificationChannel notificationChannel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationChannel = new NotificationChannel(CHANNEL_ID,
+                    CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setShowBadge(true);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(notificationChannel);
+        }
+
         //使用兼容版本
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID);
         //设置状态栏的通知图标
         builder.setSmallIcon(R.mipmap.app_geye);
         //设置通知栏横条的图标
@@ -145,7 +136,8 @@ public class BridgeService extends Service implements P2PJniCallBack {
         //右上角的时间显示
         builder.setShowWhen(true);
         //设置通知栏的标题内容
-        builder.setContentTitle("I am Foreground Service!!!");
+        builder.setContentTitle(getString(R.string.app_running));
+        builder.setContentText(getString(R.string.app_name));
         //创建通知
         Notification notification = builder.build();
         //设置为前台服务

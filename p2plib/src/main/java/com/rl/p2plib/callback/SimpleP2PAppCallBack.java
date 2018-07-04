@@ -3,6 +3,7 @@ package com.rl.p2plib.callback;
 import com.rl.p2plib.bean.Battery;
 import com.rl.p2plib.bean.CallAnswer;
 import com.rl.p2plib.bean.DetectInfo;
+import com.rl.p2plib.bean.DevLockResult;
 import com.rl.p2plib.bean.DevSdCard;
 import com.rl.p2plib.bean.DevSysSet;
 import com.rl.p2plib.bean.DevTimeZone;
@@ -180,5 +181,13 @@ public class SimpleP2PAppCallBack implements P2PAppCallBack {
 
     }
 
+    @Override
+    public void onSetLockGoke(String did, int msgType, DevLockResult devLockResult) {
 
+    }
+
+    @Override
+    public void onGetLockGoke(String did, int msgType, DevLockResult devLockResult) {
+
+    }
 }
