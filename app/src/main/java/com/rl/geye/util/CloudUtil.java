@@ -9,7 +9,6 @@ import com.rl.geye.constants.Constants;
 import com.rl.p2plib.utils.JSONUtil;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +74,7 @@ public class CloudUtil {
             .execute();
 
             if(response == null) return null;
-//          Log.e("cloud",response.body().string());
+        //           Log.e("cloud",response.body().string());
             CloudRecordsResponse cloudRecordsResponse = JSONUtil.fromJson(response.body().string(), CloudRecordsResponse.class);
             if(cloudRecordsResponse == null){
                 return null;

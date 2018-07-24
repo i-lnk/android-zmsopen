@@ -2,6 +2,7 @@ package com.rl.geye.adapter;
 
 
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
@@ -113,6 +114,34 @@ public class RecordMsgAdapter extends BaseMultiItemQuickAdapter<MultiItemEntity,
         notifyDataSetChanged();
     }
 
+    private String getUnlockType(int type) {
+        switch (type) {
+            case 0:
+                return mContext.getString(R.string.record_unlock_0);
+            case 1:
+                return mContext.getString(R.string.record_unlock_1);
+            case 2:
+                return mContext.getString(R.string.record_unlock_2);
+            case 3:
+                return mContext.getString(R.string.record_unlock_3);
+            case 4:
+                return mContext.getString(R.string.record_unlock_4);
+            case 5:
+                return mContext.getString(R.string.record_unlock_5);
+        }
+        return "error";
+    }
+
+    private String getUnlockWarn(int type) {
+        switch (type) {
+            case 0:
+                return mContext.getString(R.string.record_unlock_warn_0);
+            case 8:
+                return mContext.getString(R.string.record_unlock_warn_8);
+        }
+        return "error";
+    }
+
     @Override
     protected void convert(final BaseViewHolder holder, final MultiItemEntity data) {
         switch (holder.getItemViewType()) {
@@ -169,50 +198,69 @@ public class RecordMsgAdapter extends BaseMultiItemQuickAdapter<MultiItemEntity,
                     int descResId = -1;
                     int typeResId = -1;
                     int descColor = ContextCompat.getColor(mContext, R.color.text_hint);
-                    descResId = child.isAnswered() ? R.string.record_call_ok : R.string.record_call_no;
-                    typeResId = child.isAnswered() ? R.mipmap.a3_ic_call_ok : R.mipmap.a3_ic_call_no;
-                    descColor = ContextCompat.getColor(mContext, child.isAnswered() ? R.color.text_hint : R.color.text_red);
-//                    switch (child.getType()) {
-//                        case P2PConstants.PushType.CALL:
-//                            descResId = child.isAnswered() ? R.string.record_call_ok : R.string.record_call_no;
-//                            typeResId = child.isAnswered() ? R.mipmap.a3_ic_call_ok : R.mipmap.a3_ic_call_no;
-//                            descColor = ContextCompat.getColor(mContext, child.isAnswered() ? R.color.text_hint : R.color.text_red);
-//                            break;
-//                        case P2PConstants.PushType.PIR:
-//                            descResId = R.string.record_pir;
-//                            typeResId = R.mipmap.a3_ic_alarm;
-//                            break;
-//                        case P2PConstants.PushType.DETECTION:
-//                            descResId = R.string.record_detect;
-//                            typeResId = R.mipmap.a3_ic_alarm;
-//                            break;
-//                        case P2PConstants.PushType.ALARM_DISMANTLE:
-//                            descResId = R.string.record_dismantle;
-//                            typeResId = R.mipmap.a3_ic_alarm;
-//                            break;
-//                        case P2PConstants.PushType.ALARM_433:
-//                            descResId = R.string.record_433;
-//                            typeResId = R.mipmap.a3_ic_alarm;
-//                            break;
-//                        case P2PConstants.PushType.LOW_CHARGE:
-//                            descResId = R.string.record_low_charge;
-//                            typeResId = R.mipmap.a3_ic_alarm;
-//                            break;
-//                        default:
-//                            return;
-//                    }
+
+                    String description = "";
+
+                    switch (child.getType()) {
+                        case 0:
+                        case P2PConstants.PushType.CALL:
+                            descResId = child.isAnswered() ? R.string.record_call_ok : R.string.record_call_no;
+                            typeResId = child.isAnswered() ? R.mipmap.a3_ic_call_ok : R.mipmap.a3_ic_call_no;
+                            descColor = ContextCompat.getColor(mContext, child.isAnswered() ? R.color.text_hint : R.color.text_red);
+                            description = mContext.getString(descResId);
+                            break;
+                        case P2PConstants.PushType.PIR:
+                            descResId = R.string.record_pir;
+                            typeResId = R.mipmap.a3_ic_alarm;
+                            break;
+                        case P2PConstants.PushType.DETECTION:
+                            descResId = R.string.record_detect;
+                            typeResId = R.mipmap.a3_ic_alarm;
+                            break;
+                        case P2PConstants.PushType.ALARM_DISMANTLE:
+                            descResId = R.string.record_dismantle;
+                            typeResId = R.mipmap.a3_ic_alarm;
+                            break;
+                        case P2PConstants.PushType.ALARM_433:
+                            descResId = R.string.record_433;
+                            typeResId = R.mipmap.a3_ic_alarm;
+                            description = mContext.getString(descResId, child.getSubDev().getName());
+                            break;
+                        case P2PConstants.PushType.LOW_CHARGE:
+                            descResId = R.string.record_low_charge;
+                            typeResId = R.mipmap.a3_ic_alarm;
+                            break;
+                        case P2PConstants.PushType.LOCK_INFO:
+                            descResId = R.string.record_unlock_info;
+                            typeResId = R.mipmap.a3_ic_alarm;
+
+                            description = mContext.getString(descResId) + " "
+                                    + mContext.getString(R.string.record_battery) + ((child.getCallStatus() & 0x00ff0000) >> 16) + " "
+                                    + getUnlockType(((child.getCallStatus() & 0xff000000) >> 24));
+                            break;
+                        case P2PConstants.PushType.LOCK_WARN:
+                            descResId = R.string.record_unlock_warn;
+                            typeResId = R.mipmap.a3_ic_alarm;
+
+                            description = mContext.getString(descResId) + " "
+                                    + getUnlockWarn(((child.getCallStatus() & 0x00ff0000) >> 16)) + " "
+                                    + getUnlockType(((child.getCallStatus() & 0xff000000) >> 24));
+                            break;
+                        default:
+                            Log.e("RECORD MSG", "RECORD MSG GOT INVALID TYPE:" + child.getType());
+                            return;
+                    }
+
                     holder.setText(R.id.tv_date, child.getDate())
                             .setText(R.id.tv_dev_name, name)
-                            .setText(R.id.tv_desc, descResId)
                             .setTextColor(R.id.tv_desc, descColor)
                             .setImageResource(R.id.iv_type, typeResId)
                             .setVisible(R.id.iv_check_temp, isEditMode)
                             .setVisible(R.id.iv_check, isEditMode);
 //                            .setChecked(R.id.iv_check,child.isChecked() );
-                    if (child.getType() == P2PConstants.PushType.ALARM_433 && child.getSubDev() != null) {
-                        holder.setText(R.id.tv_desc,
-                                mContext.getString(R.string.record_433, child.getSubDev().getName()));
-                    }
+
+                    holder.setText(R.id.tv_desc, description);
+
                     holder.getView(R.id.iv_check).setSelected(child.isChecked());
                     if (isEditMode) {
                         holder.itemView.setOnClickListener(new View.OnClickListener() {

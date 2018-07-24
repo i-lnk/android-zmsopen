@@ -61,6 +61,18 @@
     <string name="record_call_ok">Answered calls</string>
     <string name="record_call_no">Missed calls </string>
     <string name="record_low_charge">Low charge </string>
+    <string name="record_unlock_info">unlock</string>
+    <string name="record_unlock_warn">lock warnning</string>
+    <string name="record_battery">battery:</string>
+    <string name="record_unlock_0">by user</string>
+    <string name="record_unlock_1">by fingerprint</string>
+    <string name="record_unlock_2">by password</string>
+    <string name="record_unlock_3">by card</string>
+    <string name="record_unlock_4">by key</string>
+    <string name="record_unlock_5">by application user</string>
+    <string name="record_unlock_warn_0">break unlock</string>
+    <string name="record_unlock_warn_8">force unlock</string>
+
     <!-- 设置 -->
     <string name="ring_call">Call Ringtone</string>
     <string name="ring_alarm">Alarm Ringtone</string>

@@ -1,13 +1,12 @@
 package com.rl.geye.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.widget.Checkable;
 
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.rl.geye.constants.Constants;
 import com.rl.geye.db.bean.EdwinDevice;
 import com.rl.geye.db.bean.SubDevice;
+import com.rl.p2plib.constants.P2PConstants;
 
 public class CloudRecord implements Checkable, MultiItemEntity {
     private String devId;
@@ -82,6 +81,11 @@ public class CloudRecord implements Checkable, MultiItemEntity {
     }
 
     public boolean isAnswered(){
+        switch (device.getType()) {
+            case P2PConstants.DeviceType.CAT_DOUBLE_EYE:
+            case P2PConstants.DeviceType.CAT_SING_EYE:
+                return ((callStatus & 0xff0000) >> 16) != 0;
+        }
         return callStatus != 0;
     }
 

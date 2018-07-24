@@ -62,6 +62,17 @@
     <string name="record_call_ok">已接来电</string>
     <string name="record_call_no">未接来电</string>
     <string name="record_low_charge">门铃低电量</string>
+    <string name="record_unlock_info">门锁打开</string>
+    <string name="record_unlock_warn">门锁报警</string>
+    <string name="record_battery">电量:</string>
+    <string name="record_unlock_0">默认用户</string>
+    <string name="record_unlock_1">指纹解锁</string>
+    <string name="record_unlock_2">密码解锁</string>
+    <string name="record_unlock_3">IC卡解锁</string>
+    <string name="record_unlock_4">钥匙解锁</string>
+    <string name="record_unlock_5">应用解锁</string>
+    <string name="record_unlock_warn_0">锁被破坏</string>
+    <string name="record_unlock_warn_8">胁迫开锁</string>
 
     <!-- 设置 -->
     <string name="ring_call">呼叫铃声</string>

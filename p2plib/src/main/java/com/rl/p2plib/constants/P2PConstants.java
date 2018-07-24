@@ -140,7 +140,9 @@ public class P2PConstants {
     public class PushType {
         public static final int CALL = 1;//呼叫
         public static final int PIR = 2;//
-        public static final int DETECTION = 3;//移动侦测
+        public static final int DETECTION = 3;  // 移动侦测
+        public static final int LOCK_INFO = 4;  // 锁信息
+        public static final int LOCK_WARN = 5;  // 锁报警
         public static final int ALARM_DISMANTLE = 7;//防拆报警
         public static final int LOW_CHARGE = 8;//低电量报警
         public static final int ALARM_433 = 10000;//433报警 ( 大于10000 )

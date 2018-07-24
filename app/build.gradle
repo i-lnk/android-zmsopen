@@ -35,8 +35,8 @@ android {
         minSdkVersion 17
         targetSdkVersion 27
         applicationId "com.rl.geye"
-        versionCode 73
-        versionName "1.8.2"
+        versionCode 74
+        versionName "1.8.3"
         multiDexEnabled true
 
         ndk {
