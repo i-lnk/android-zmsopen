@@ -22,6 +22,7 @@ public class SysInfo implements Parcelable {
     private int supportAudioIn;
     private int supportAudioOut;
     private int supportWakeUpControl;
+    private int supportUnlock;
 
 
     public int getDevType() {
@@ -120,6 +121,14 @@ public class SysInfo implements Parcelable {
         this.supportWakeUpControl = supportWakeUpControl;
     }
 
+    public int getSupportUnlock() {
+        return supportUnlock;
+    }
+
+    public void setSupportUnlock(int supportUnlock) {
+        this.supportUnlock = supportUnlock;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -139,6 +148,7 @@ public class SysInfo implements Parcelable {
         dest.writeInt(this.supportAudioIn);
         dest.writeInt(this.supportAudioOut);
         dest.writeInt(this.supportWakeUpControl);
+        dest.writeInt(this.supportUnlock);
     }
 
     public SysInfo() {
@@ -157,6 +167,7 @@ public class SysInfo implements Parcelable {
         this.supportAudioIn = in.readInt();
         this.supportAudioOut = in.readInt();
         this.supportWakeUpControl=in.readInt();
+        this.supportUnlock = in.readInt();
     }
 
     public static final Parcelable.Creator<SysInfo> CREATOR = new Parcelable.Creator<SysInfo>() {
