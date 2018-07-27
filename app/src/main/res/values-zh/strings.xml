@@ -121,7 +121,7 @@
     <string name="network_camera">网络摄像机</string>
     <string name="network_camera_text">按住设备的Reset键3到5秒，听到语音播放\"恢复出厂成功\"，等待设备提示\"启动成功\"。</string>
     <string name="tips_add_step_1"> 请将设备进入配置WIFI模式。</string>
-    <string name="tips_add_step_qr"> 请将手机二维码置于摄像头前方30-50厘米，听到\"无线信息获取成功\"后可将手机移开，听到\"无线连接成功\"，再点击下一步添加设备 </string>
+    <string name="tips_add_step_qr"> 请将手机二维码置于摄像头前方10-20厘米，听到\"无线信息获取成功\"后可将手机移开，听到\"无线连接成功\"，再点击下一步添加设备 </string>
     <string name="wifi_set_dev_dlg_msg"> WIFI需要连接到以AP_开头的设备热点，是否连接？</string>
 
     <string name="tips_add_step_2">仅支持2.4G WiFi</string>

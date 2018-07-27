@@ -120,7 +120,7 @@
     <string name="network_camera_text">press the reset key of the device for 3~5 seconds until voice playback \"restore factory success\",
         wait for device prompt \"start successfully\".</string>
     <string name="tips_add_step_1"> Please put the device into the configuration WIFI mode.</string>
-    <string name="tips_add_step_qr"> Please put the QR code against the camera,keep at 30-50 cm.when hearing \"wireless information is successful\", you can remove the mobile phone.When listen to \"wireless connection success\", click the next step to add device. </string>
+    <string name="tips_add_step_qr"> Please put the QR code against the camera,keep at 10-20 cm.when hearing \"wireless information is successful\", you can remove the mobile phone.When listen to \"wireless connection success\", click the next step to add device. </string>
     <string name="wifi_set_dev_dlg_msg"> WIFI needs to connect to the device AP that starts with \'AP_\'. do you want to connected?</string>
 
     <string name="tips_add_step_2">Only 2.4G WiFi is supported</string>
